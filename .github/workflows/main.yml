@@ -1,0 +1,35 @@
+name: Convert Markdown to PDF
+
+on:
+  workflow_dispatch:
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-xetex
+
+      - name: Convert Markdown files
+        run: |
+          mkdir -p pdf-learning
+
+          find . -name "*.md" | while read file; do
+            rel="${file#./}"
+            pdf="pdf-learning/${rel%.md}.pdf"
+
+            mkdir -p "$(dirname "$pdf")"
+
+            pandoc "$file" -o "$pdf"
+          done
+
+      - name: Upload PDFs
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-learning
+          path: pdf-learning
