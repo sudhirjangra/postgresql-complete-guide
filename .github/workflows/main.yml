@@ -14,18 +14,20 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y pandoc texlive-xetex
-
       - name: Convert Markdown files
         run: |
           mkdir -p pdf-learning
-
+      
           find . -name "*.md" | while read file; do
             rel="${file#./}"
             pdf="pdf-learning/${rel%.md}.pdf"
-
+      
             mkdir -p "$(dirname "$pdf")"
-
-            pandoc "$file" -o "$pdf"
+      
+            pandoc "$file" \
+              --pdf-engine=xelatex \
+              -V mainfont="DejaVu Sans Mono" \
+              -o "$pdf"
           done
 
       - name: Upload PDFs
