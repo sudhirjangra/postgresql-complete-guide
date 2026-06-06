@@ -8,25 +8,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Install Pandoc
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive-xetex
+          sudo apt-get install -y \
+            pandoc \
+            texlive-xetex \
+            fonts-noto \
+            fonts-noto-core \
+            fonts-noto-mono
+
       - name: Convert Markdown files
         run: |
           mkdir -p pdf-learning
-      
-          find . -name "*.md" | while read file; do
+
+          find . -type f -name "*.md" | while read file; do
+            echo "Processing: $file"
+
             rel="${file#./}"
             pdf="pdf-learning/${rel%.md}.pdf"
-      
+
             mkdir -p "$(dirname "$pdf")"
-      
+
             pandoc "$file" \
               --pdf-engine=xelatex \
-              -V mainfont="DejaVu Sans Mono" \
+              -V mainfont="Noto Sans" \
+              -V monofont="Noto Sans Mono" \
               -o "$pdf"
           done
 
